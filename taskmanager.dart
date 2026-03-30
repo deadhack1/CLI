@@ -9,7 +9,7 @@ class TaskManager{
   //final - created once , never reassigned (but the list contents CAN change)
   final List<Task> tasks = [];
 
-  //A counnter that genuinely needs to increment -- var is correct here
+  //A counter that genuinely needs to increment -- var is correct here
   var _nextId = 1;
 
   void addTask(String tittle,{String? dueDate, List<String> tags =const []}){
