@@ -31,18 +31,59 @@ class TaskManager {
     task.status = statusDone; //allowed because status is not final
   }
 
-  // New : Map -- builing a summary of tasks grouped by status
-  Map<String, int> getSummary() {
-    //Start with a Map where every status begins at 0
-    final Map<String, int> summary = {statusPending: 0, statusDone: 0};
+  //Rewriten with .where ()-----
+  List<Task> getTasksByTag(String tag) =>
+      tasks.where((task) => task.tags.contains(tag)).toList();
 
-    for (final task in tasks) {
-      //sumary[task.status] could be null if an unknown status existed
-      //?? 0 ensures we never add to null
-      summary[task.status] = (summary[task.status] ?? 0) + 1;
-    }
-    return summary;
-  }
+  List<Task> getTasksByStatus(String status) =>
+      tasks.where((task) => task.status == status).toList();
+
+  //-- map() to transform tasks into display strings.
+  //map converys each task into a string - the list type changes entirely
+  List<String> getTaskTitles() =>
+      tasks.map((task) => '$task.id}. $task.title').toList();
+
+  //chain .where() and .map() together - filter THEN transform
+  List<String> getDoneTitles() => tasks
+      .where((task) => task.status == statusDone)
+      .map((task) => '✓ ${task.title}')
+      .toList();
+
+  // fold() collapse list into a single value--
+  //fold is safer then reduce because it starts with an initial value and never operates on an empty list
+  //the '0' is the starting value , 'count' accumulates 'task' is each item
+  int countDone() => tasks.fold(
+    0,
+    (count, task) => task.status == statusDone ? count + 1 : count,
+  );
+
+  // // New : Map -- builing a summary of tasks grouped by status
+  // Map<String, int> getSummary() {
+  //   //Start with a Map where every status begins at 0
+  //   final Map<String, int> summary = {statusPending: 0, statusDone: 0};
+
+  //   for (final task in tasks) {
+  //     //sumary[task.status] could be null if an unknown status existed
+  //     //?? 0 ensures we never add to null
+  //     summary[task.status] = (summary[task.status] ?? 0) + 1;
+  //   }
+  //   return summary;
+  // }
+
+  //using fold to buils the summary map in a more functional style
+  Map<String, int> getSummary() =>
+      tasks.fold({statusPending: 0, statusDone: 0}, (summary, task) {
+        summary[task.status] = (summary[task.status] ?? 0) + 1;
+        return summary;
+      });
+
+  //closures closing over outer scope
+  //this returns a function - the returned closure remembers 'status' evern after filterBystatus() has returned.
+  bool Function(Task) filterByStatus(String status)=>(task)=>task.status==status;
+
+  //now. you can use closures anywhere
+List<Task> getPending()=> tasks.where(filterByStatus(statusPending)).toList();
+List<Task> getDone()=>tasks.where(filterByStatus(statusDone)).toList();
 
   //New Set- collect every unique tag across all tasks
   Set<String> getAllUniqueTags() {
@@ -65,26 +106,24 @@ class TaskManager {
     return '[${task.status.toUpperCase()}] ${task.id}. ${task.title} | Due:$due | Tags: $tagLine';
   }
 
-  void printAll(){
-    if(tasks.isEmpty){
+  void printAll() {
+    if (tasks.isEmpty) {
       print('No tasks to display.');
-  }
-  for (final task in tasks){
-    print(formatTask(task));
-  
-  }
+    }
+    for (final task in tasks) {
+      print(formatTask(task));
+    }
   }
 
-  void printSummary(){
+  void printSummary() {
     final summary = getSummary();
-    final tags=getAllUniqueTags();
+    final tags = getAllUniqueTags();
 
     print('\n---Summary---');
     //Map Iteration gives you MapEntry with .key and .value
-    for(final entry in summary.entries){
+    for (final entry in summary.entries) {
       print('${entry.key}: ${entry.value} tasks(s)');
-
     }
-    print('\nAll Unique tags: ${tags.isEmpty?'none':tags.join(', ')}');
+    print('\nAll Unique tags: ${tags.isEmpty ? 'none' : tags.join(', ')}');
   }
 }

@@ -24,10 +24,30 @@ void main() {
     dueDate: '2026-04-20',
     tags: ['flutter', 'state'],
   );
+  manager.addTask('Wrire unit tests',tags:['dart','testing']);
 
-  print('===All Tasks===\n');
-  manager.printAll();
+  manager.markDone(1);
+  manager.markDone(3);
+
+  print('=== All Titles ===');
+  manager.getTaskTitles().forEach(print);
+
+  print('/n== Completed ===');
+  manager.getDoneTitles().forEach(print);
+
+  print('\n== Flutter Tasks ===');
+  manager.getTasksByTag('flutter').map(manager.formatTask).forEach(print);
+
+  print('\n== Pending Tasks ===');
+  manager.getPending().map(manager.formatTask).forEach(print);
+
   manager.printSummary();
+
+
+
+  // print('===All Tasks===\n');
+  // manager.printAll();
+  // manager.printSummary();
 
   // //Print all tasks to verify
   // for (final task in manager.tasks) {
