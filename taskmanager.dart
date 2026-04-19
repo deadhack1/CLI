@@ -57,6 +57,24 @@ class TaskManager {
     (count, task) => task.status == statusDone ? count + 1 : count,
   );
 
+  //step 5 homework
+  String? getTopTag() {
+    //fist we build a Map of tag counts using fold to iterate over all tasks and their tags
+    Map<String, int> tagCounts = tasks.fold({}, (tagCount, task) {
+      task.tags.forEach((tag) {
+        tagCount[tag] = (tagCount[tag] ?? 0) + 1;
+      });
+      return tagCount;
+    });
+
+    //find the tag with the highest count using higher order function on the map entries only
+    return tagCounts.entries.fold(tagCounts.entries.first, (best, entry) {
+      if (entry.value > best.value) {
+        return entry;
+      }
+      return best;
+    }).key;
+  }
   // // New : Map -- builing a summary of tasks grouped by status
   // Map<String, int> getSummary() {
   //   //Start with a Map where every status begins at 0
@@ -70,7 +88,7 @@ class TaskManager {
   //   return summary;
   // }
 
-  //using fold to buils the summary map in a more functional style
+  //using fold to builds the summary map in a more functional style
   Map<String, int> getSummary() =>
       tasks.fold({statusPending: 0, statusDone: 0}, (summary, task) {
         summary[task.status] = (summary[task.status] ?? 0) + 1;
@@ -79,11 +97,13 @@ class TaskManager {
 
   //closures closing over outer scope
   //this returns a function - the returned closure remembers 'status' evern after filterBystatus() has returned.
-  bool Function(Task) filterByStatus(String status)=>(task)=>task.status==status;
+  bool Function(Task) filterByStatus(String status) =>
+      (task) => task.status == status;
 
   //now. you can use closures anywhere
-List<Task> getPending()=> tasks.where(filterByStatus(statusPending)).toList();
-List<Task> getDone()=>tasks.where(filterByStatus(statusDone)).toList();
+  List<Task> getPending() =>
+      tasks.where(filterByStatus(statusPending)).toList();
+  List<Task> getDone() => tasks.where(filterByStatus(statusDone)).toList();
 
   //New Set- collect every unique tag across all tasks
   Set<String> getAllUniqueTags() {

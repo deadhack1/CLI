@@ -42,8 +42,8 @@ void main() {
   manager.getPending().map(manager.formatTask).forEach(print);
 
   manager.printSummary();
-
-
+  print('\n== Top Tag ==');
+  print("The top tag is ${manager.getTopTag()??'No Tags Found'}");
 
   // print('===All Tasks===\n');
   // manager.printAll();
